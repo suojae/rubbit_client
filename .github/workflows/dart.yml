@@ -1,0 +1,24 @@
+name: Dart 코드 포맷팅 CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Flutter SDK 설치
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: 의존성 설치
+        run: flutter pub get
+
+      - name: 포맷팅 확인
+        run: dart format --output=none --set-exit-if-changed .

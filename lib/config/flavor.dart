@@ -4,7 +4,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rubbit_client/config/firebase_options_dev.dart';
 import 'package:rubbit_client/config/firebase_options_prod.dart';
-import 'package:rubbit_client/config/flavor_type.dart';
+
+enum FlavorType {
+  dev,
+  prod;
+
+  static FlavorType fromString(String? value) {
+    return switch (value?.toLowerCase()) {
+      "dev" => FlavorType.dev,
+      _ => kDebugMode ? FlavorType.dev : FlavorType.prod,
+    };
+  }
+}
 
 abstract class FlavorConfig {
   static FlavorConfig? _instance;

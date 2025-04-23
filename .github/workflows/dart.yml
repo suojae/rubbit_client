@@ -1,4 +1,4 @@
-name: Dart 코드 포맷팅 CI
+name: Flutter CI/CD
 
 on:
   push:
@@ -22,3 +22,25 @@ jobs:
 
       - name: 포맷팅 확인
         run: dart format --output=none --set-exit-if-changed .
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Flutter SDK 설치
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: 의존성 설치
+        run: flutter pub get
+
+      - name: 테스트 실행 및 커버리지 생성
+        run: flutter test --coverage
+
+      - name: Codecov로 커버리지 보고서 업로드
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info

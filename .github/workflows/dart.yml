@@ -40,7 +40,7 @@ jobs:
         run: flutter test --coverage
 
       - name: Codecov에 보고서 업로드
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}

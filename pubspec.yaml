@@ -72,3 +72,4 @@ flutter:
     - .env.dev
     - .env.prod
     - assets/images/splash_screen.png
+    - assets/images/social_login.png

@@ -41,10 +41,10 @@ class ValidationException extends ApiException {
   final Map<String, String> errors;
 
   ValidationException({
-    required String code,
-    required String message,
+    required super.code,
+    required super.message,
     this.errors = const {},
-  }) : super(code: code, message: message);
+  });
 
   @override
   String toString() {

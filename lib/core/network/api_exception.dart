@@ -13,32 +13,27 @@ class ApiException implements Exception {
 
 /// 400 Bad Request 예외
 class BadRequestException extends ApiException {
-  BadRequestException({required String code, required String message})
-      : super(code: code, message: message);
+  BadRequestException({required super.code, required super.message});
 }
 
 /// 401 Unauthorized 예외
 class UnauthorizedException extends ApiException {
-  UnauthorizedException({required String code, required String message})
-      : super(code: code, message: message);
+  UnauthorizedException({required super.code, required super.message});
 }
 
 /// 403 Forbidden 예외
 class ForbiddenException extends ApiException {
-  ForbiddenException({required String code, required String message})
-      : super(code: code, message: message);
+  ForbiddenException({required super.code, required super.message});
 }
 
 /// 404 Not Found 예외
 class NotFoundException extends ApiException {
-  NotFoundException({required String code, required String message})
-      : super(code: code, message: message);
+  NotFoundException({required super.code, required super.message});
 }
 
 /// 409 Conflict 예외
 class ConflictException extends ApiException {
-  ConflictException({required String code, required String message})
-      : super(code: code, message: message);
+  ConflictException({required super.code, required super.message});
 }
 
 /// 422 Validation 예외
@@ -59,14 +54,12 @@ class ValidationException extends ApiException {
 
 /// 429 Too Many Requests 예외
 class TooManyRequestsException extends ApiException {
-  TooManyRequestsException({required String code, required String message})
-      : super(code: code, message: message);
+  TooManyRequestsException({required super.code, required super.message});
 }
 
 /// 500 Server 예외
 class ServerException extends ApiException {
-  ServerException({required String code, required String message})
-      : super(code: code, message: message);
+  ServerException({required super.code, required super.message});
 }
 
 /// 네트워크 연결 예외

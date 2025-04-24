@@ -36,14 +36,8 @@ jobs:
       - name: 의존성 설치
         run: flutter pub get
 
-      - name: LCOV 도구 설치
-        run: sudo apt-get install -y lcov
-
       - name: 테스트 실행 및 커버리지 측정
         run: flutter test --coverage
-
-      - name: Firebase 설정 파일 필터링
-        run: lcov --remove coverage/lcov.info 'lib/config/firebase_options_*.dart' -o coverage/lcov.info
 
       - name: Codecov에 보고서 업로드
         uses: codecov/codecov-action@v3

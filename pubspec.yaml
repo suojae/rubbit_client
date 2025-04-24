@@ -38,7 +38,7 @@ dependencies:
   package_info_plus: ^4.2.0
 
   # UI/UX
-  flutter_native_splash: ^2.3.6
+  flutter_native_splash: ^2.4.4
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.0
   shimmer: ^3.0.0
@@ -71,3 +71,4 @@ flutter:
   assets:
     - .env.dev
     - .env.prod
+    - assets/images/splash_screen.png

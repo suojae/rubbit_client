@@ -1,188 +1,118 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mockito/annotations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rubbit_client/config/flavor.dart';
 
-@GenerateMocks([])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('FlavorType 테스트', () {
-    test('문자열 "dev"가 주어지면, FlavorType.dev를 반환해야 한다', () {
-      // given
-      final String flavorString = 'dev';
+  group('FlavorType.fromString', () {
+    test(
+      'Given 문자열이 "dev"인 경우 When fromString을 호출하면 Then FlavorType.dev가 반환된다.',
+      () {
+        const input = 'dev';
+        final result = FlavorType.fromString(input);
+        expect(result, FlavorType.dev);
+      },
+    );
 
-      // when
-      final result = FlavorType.fromString(flavorString);
+    test(
+      'Given 대소문자가 섞인 "DEV"인 경우 When fromString을 호출하면 Then FlavorType.dev가 반환된다.',
+      () {
+        const input = 'DEV';
+        final result = FlavorType.fromString(input);
+        expect(result, FlavorType.dev);
+      },
+    );
 
-      // then
-      expect(result, equals(FlavorType.dev));
+    test(
+      'Given 지원되지 않는 문자열이고 kDebugMode=true인 환경 When fromString을 호출하면 Then FlavorType.dev가 반환된다.',
+      () {
+        const input = 'unexpected';
+        final result = FlavorType.fromString(input);
+        expect(kDebugMode, isTrue);
+        expect(result, FlavorType.dev);
+      },
+    );
+  });
+
+  group('FlavorConfig.instance', () {
+    test(
+      'Given FLAVOR 미지정 & 디버그 모드 When instance를 호출하면 Then DevFlavorConfig가 반환된다.',
+      () {
+        final instance = FlavorConfig.instance;
+        expect(instance, isA<DevFlavorConfig>());
+
+        // 싱글턴 확인 (두 번째 호출도 동일 객체)
+        final instance2 = FlavorConfig.instance;
+        expect(identical(instance, instance2), isTrue);
+      },
+    );
+  });
+
+  group('DevFlavorConfig', () {
+    final config = DevFlavorConfig();
+
+    test('Given DevFlavorConfig 인스턴스 When 각 속성을 조회하면 Then 정의된 값이 반환된다.', () {
+      expect(config.flavorType, FlavorType.dev);
+      expect(config.appTitle, 'RUBBIT Dev');
+      expect(config.baseApiUrl, 'https://rubbit-dev.suojae.kr/');
+      expect(config.isLoggingEnabled, isTrue);
+      expect(config.apiTimeoutSeconds, 30);
+      expect(config.firebaseOptions, isNotNull);
     });
 
-    test('대소문자 구분 없이 "DEV"가 주어지면, FlavorType.dev를 반환해야 한다', () {
-      // given
-      final String flavorString = 'DEV';
+    test('Given 테스트용 env 값이 주입된 상태 When env()를 호출하면 Then 주입한 값을 돌려준다.', () {
+      dotenv.testLoad(fileInput: 'TEST_KEY=dev-value');
+      addTearDown(dotenv.clean);
 
-      // when
-      final result = FlavorType.fromString(flavorString);
-
-      // then
-      expect(result, equals(FlavorType.dev));
+      final value = config.env('TEST_KEY');
+      expect(value, 'dev-value');
     });
 
-    test('빈 문자열이 주어지고 디버그 모드일 때, FlavorType.dev를 반환해야 한다', () {
-      // given
-      final String flavorString = '';
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    test('Given 존재하지 않는 키 When env()를 호출하면 Then 기본값을 돌려준다.', () {
+      // Given – 초기화 (값은 비워둬도 OK)
+      dotenv.testLoad(fileInput: '.env.dev');
+      addTearDown(dotenv.clean);
 
-      // when
-      final result = FlavorType.fromString(flavorString);
+      // When
+      final value = config.env('UNKNOWN_KEY', defaultValue: 'fallback');
 
-      // then
-      expect(result, equals(FlavorType.dev));
-      debugDefaultTargetPlatformOverride = null;
-    });
-
-    test('null이 주어지고 프로덕션 모드일 때, FlavorType.prod를 반환해야 한다', () {
-      // given
-      final String? flavorString = null;
-      // 프로덕션 모드 시뮬레이션을 위한 설정이 필요함
-
-      // when
-      final result = FlavorType.fromString(flavorString);
-
-      // then
-      // 참고: 실제 테스트에서는 프로덕션 모드를 시뮬레이션하기 어려울 수 있음
-      // 디버그 모드에서는 기본적으로 FlavorType.dev를 반환할 것임
-      expect(result, equals(FlavorType.dev));
+      // Then
+      expect(value, 'fallback');
     });
   });
 
-  group('DevFlavorConfig 테스트', () {
-    late DevFlavorConfig devConfig;
+  group('ProdFlavorConfig', () {
+    final config = ProdFlavorConfig();
 
-    setUp(() {
-      devConfig = DevFlavorConfig();
+    test('Given ProdFlavorConfig 인스턴스 When 각 속성을 조회하면 Then 정의된 값이 반환된다.', () {
+      expect(config.flavorType, FlavorType.prod);
+      expect(config.appTitle, 'RUBBIT');
+      expect(config.baseApiUrl, 'https://rubbit.suojae.kr/');
+      expect(config.isLoggingEnabled, isFalse);
+      expect(config.apiTimeoutSeconds, 15);
+      expect(config.firebaseOptions, isNotNull);
     });
 
-    test('DevFlavorConfig가 생성되면, 올바른 flavorType을 반환해야 한다', () {
-      // given
-      // DevFlavorConfig가 생성됨
+    test('Given 테스트용 env 값이 주입된 상태 When env()를 호출하면 Then 주입한 값을 돌려준다.', () {
+      dotenv.testLoad(fileInput: 'TEST_KEY=prod-value');
+      addTearDown(dotenv.clean);
 
-      // when
-      final flavorType = devConfig.flavorType;
-
-      // then
-      expect(flavorType, equals(FlavorType.dev));
+      final value = config.env('TEST_KEY');
+      expect(value, 'prod-value');
     });
 
-    test('DevFlavorConfig가 생성되면, 올바른 appTitle을 반환해야 한다', () {
-      // given
-      // DevFlavorConfig가 생성됨
+    test('Given 존재하지 않는 키 When env()를 호출하면 Then 기본값을 돌려준다.', () {
+      // Given – 초기화 (값은 비워둬도 OK)
+      dotenv.testLoad(fileInput: '.env.prod');
+      addTearDown(dotenv.clean);
 
-      // when
-      final appTitle = devConfig.appTitle;
+      // When
+      final value = config.env('UNKNOWN_KEY', defaultValue: 'fallback');
 
-      // then
-      expect(appTitle, equals('RUBBIT Dev'));
-    });
-
-    test('DevFlavorConfig가 생성되면, 올바른: baseApiUrl을 반환해야 한다', () {
-      // given
-      // DevFlavorConfig가 생성됨
-
-      // when
-      final baseApiUrl = devConfig.baseApiUrl;
-
-      // then
-      expect(baseApiUrl, equals('https://rubbit-dev.suojae.kr/'));
-    });
-
-    test('DevFlavorConfig가 생성되면, 로깅이 활성화되어 있어야 한다', () {
-      // given
-      // DevFlavorConfig가 생성됨
-
-      // when
-      final isLoggingEnabled = devConfig.isLoggingEnabled;
-
-      // then
-      expect(isLoggingEnabled, isTrue);
-    });
-
-    test('DevFlavorConfig가 생성되면, API 타임아웃이 30초여야 한다', () {
-      // given
-      // DevFlavorConfig가 생성됨
-
-      // when
-      final apiTimeoutSeconds = devConfig.apiTimeoutSeconds;
-
-      // then
-      expect(apiTimeoutSeconds, equals(30));
-    });
-  });
-
-  group('ProdFlavorConfig 테스트', () {
-    late ProdFlavorConfig prodConfig;
-
-    setUp(() {
-      prodConfig = ProdFlavorConfig();
-    });
-
-    test('ProdFlavorConfig가 생성되면, 올바른 flavorType을 반환해야 한다', () {
-      // given
-      // ProdFlavorConfig가 생성됨
-
-      // when
-      final flavorType = prodConfig.flavorType;
-
-      // then
-      expect(flavorType, equals(FlavorType.prod));
-    });
-
-    test('ProdFlavorConfig가 생성되면, 올바른 appTitle을 반환해야 한다', () {
-      // given
-      // ProdFlavorConfig가 생성됨
-
-      // when
-      final appTitle = prodConfig.appTitle;
-
-      // then
-      expect(appTitle, equals('RUBBIT'));
-    });
-
-    test('ProdFlavorConfig가 생성되면, 올바른: baseApiUrl을 반환해야 한다', () {
-      // given
-      // ProdFlavorConfig가 생성됨
-
-      // when
-      final baseApiUrl = prodConfig.baseApiUrl;
-
-      // then
-      expect(baseApiUrl, equals('https://rubbit.suojae.kr/'));
-    });
-
-    test('ProdFlavorConfig가 생성되면, 로깅이 비활성화되어 있어야 한다', () {
-      // given
-      // ProdFlavorConfig가 생성됨
-
-      // when
-      final isLoggingEnabled = prodConfig.isLoggingEnabled;
-
-      // then
-      expect(isLoggingEnabled, isFalse);
-    });
-
-    test('ProdFlavorConfig가 생성되면, API 타임아웃이 15초여야 한다', () {
-      // given
-      // ProdFlavorConfig가 생성됨
-
-      // when
-      final apiTimeoutSeconds = prodConfig.apiTimeoutSeconds;
-
-      // then
-      expect(apiTimeoutSeconds, equals(15));
+      // Then
+      expect(value, 'fallback');
     });
   });
 }

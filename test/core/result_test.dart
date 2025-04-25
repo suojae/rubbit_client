@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rubbit_client/core/type/result.dart';
 
@@ -199,6 +200,50 @@ void main() {
       ]).foldResult((_) => 'success', (e) => 'fail:$e');
 
       expect(await stream.toList(), ['fail:e1', 'fail:e2']);
+    });
+  });
+
+  group('InspectResult – 로그 처리', () {
+    test('Given Success.inspect() 호출'
+        'When debugPrint 오버라이드'
+        'Then 로그에 성공 메시지가 기록되고 자기 자신을 반환한다.', () {
+      // Given
+      final result = Result.success(42);
+      final logs = <String?>[];
+      final original = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) => logs.add(message);
+
+      try {
+        // When
+        final returned = result.inspect('TAG');
+
+        // Then
+        expect(identical(returned, result), isTrue);
+        expect(logs, contains('[TAG] Success: 42'));
+      } finally {
+        debugPrint = original;
+      }
+    });
+
+    test('Given Failure.inspect() 호출'
+        'When debugPrint 오버라이드'
+        'Then 로그에 실패 메시지가 기록되고 자기 자신을 반환한다.', () {
+      // Given
+      final result = Result.failure('oops');
+      final logs = <String?>[];
+      final original = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) => logs.add(message);
+
+      try {
+        // When
+        final returned = result.inspect('TAG');
+
+        // Then
+        expect(identical(returned, result), isTrue);
+        expect(logs, contains('[TAG] Failure: oops'));
+      } finally {
+        debugPrint = original;
+      }
     });
   });
 }

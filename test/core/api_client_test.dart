@@ -33,16 +33,27 @@ void main() {
         statusCode: 200,
       );
       when(
-        mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams),
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
       ).thenAnswer((_) async => response);
 
       // When
-      final result = await apiClient.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams);
+      final result = await apiClient.get<Map<String, dynamic>>(
+        testPath,
+        queryParameters: testQueryParams,
+      );
 
       // Then
       expect(result.isSuccess, isTrue);
       expect(result.getOrNull(), responseData);
-      verify(mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams)).called(1);
+      verify(
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
+      ).called(1);
     });
 
     test('Given Dio에서 예외가 발생하는 상황'
@@ -54,28 +65,52 @@ void main() {
         error: 'Test error',
         message: '네트워크 오류',
       );
-      when(mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams)).thenThrow(dioError);
+      when(
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
+      ).thenThrow(dioError);
 
       // When
-      final result = await apiClient.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams);
+      final result = await apiClient.get<Map<String, dynamic>>(
+        testPath,
+        queryParameters: testQueryParams,
+      );
 
       // Then
       expect(result.isFailure, isTrue);
       final error = (result as Failure<dynamic, ApiException>).error;
       expect(error.code, 'dio_error');
       expect(error.message, '네트워크 오류');
-      verify(mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams)).called(1);
+      verify(
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
+      ).called(1);
     });
 
     test('Given Dio에서 message가 없는 예외가 발생하는 상황'
         'When GET 요청을 수행하면'
         'Then 기본 오류 메시지가 있는 실패 Result를 반환한다', () async {
       // Given
-      final dioError = DioException(requestOptions: RequestOptions(path: testPath), error: 'Test error');
-      when(mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams)).thenThrow(dioError);
+      final dioError = DioException(
+        requestOptions: RequestOptions(path: testPath),
+        error: 'Test error',
+      );
+      when(
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
+      ).thenThrow(dioError);
 
       // When
-      final result = await apiClient.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams);
+      final result = await apiClient.get<Map<String, dynamic>>(
+        testPath,
+        queryParameters: testQueryParams,
+      );
 
       // Then
       expect(result.isFailure, isTrue);
@@ -89,10 +124,18 @@ void main() {
         'Then unknown 코드의 실패 Result를 반환한다', () async {
       // Given
       final exception = Exception('일반 예외');
-      when(mockDio.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams)).thenThrow(exception);
+      when(
+        mockDio.get<Map<String, dynamic>>(
+          testPath,
+          queryParameters: testQueryParams,
+        ),
+      ).thenThrow(exception);
 
       // When
-      final result = await apiClient.get<Map<String, dynamic>>(testPath, queryParameters: testQueryParams);
+      final result = await apiClient.get<Map<String, dynamic>>(
+        testPath,
+        queryParameters: testQueryParams,
+      );
 
       // Then
       expect(result.isFailure, isTrue);
@@ -118,7 +161,11 @@ void main() {
         statusCode: 201,
       );
       when(
-        mockDio.post<Map<String, dynamic>>(testPath, data: testData, queryParameters: testQueryParams),
+        mockDio.post<Map<String, dynamic>>(
+          testPath,
+          data: testData,
+          queryParameters: testQueryParams,
+        ),
       ).thenAnswer((_) async => response);
 
       // When
@@ -131,7 +178,13 @@ void main() {
       // Then
       expect(result.isSuccess, isTrue);
       expect(result.getOrNull(), responseData);
-      verify(mockDio.post<Map<String, dynamic>>(testPath, data: testData, queryParameters: testQueryParams)).called(1);
+      verify(
+        mockDio.post<Map<String, dynamic>>(
+          testPath,
+          data: testData,
+          queryParameters: testQueryParams,
+        ),
+      ).called(1);
     });
 
     test('Given Dio에서 예외가 발생하는 상황'
@@ -144,7 +197,11 @@ void main() {
         message: '서버 오류',
       );
       when(
-        mockDio.post<Map<String, dynamic>>(testPath, data: testData, queryParameters: testQueryParams),
+        mockDio.post<Map<String, dynamic>>(
+          testPath,
+          data: testData,
+          queryParameters: testQueryParams,
+        ),
       ).thenThrow(dioError);
 
       // When
@@ -167,7 +224,11 @@ void main() {
       // Given
       final exception = FormatException('JSON 파싱 오류');
       when(
-        mockDio.post<Map<String, dynamic>>(testPath, data: testData, queryParameters: testQueryParams),
+        mockDio.post<Map<String, dynamic>>(
+          testPath,
+          data: testData,
+          queryParameters: testQueryParams,
+        ),
       ).thenThrow(exception);
 
       // When
@@ -191,7 +252,10 @@ void main() {
         'Then 적절한 ApiException으로 변환된다', () {
       // Given
       final apiClient = ApiClient(Dio());
-      final _ = DioException(requestOptions: RequestOptions(path: '/test'), message: '테스트 오류');
+      final _ = DioException(
+        requestOptions: RequestOptions(path: '/test'),
+        message: '테스트 오류',
+      );
 
       // When
       // private 메서드를 직접 테스트할 수 없으므로 get 메서드를 통해 간접적으로 테스트
@@ -201,7 +265,11 @@ void main() {
       expectLater(
         future,
         completion(
-          isA<Result<Map<String, dynamic>, ApiException>>().having((result) => result.isFailure, 'isFailure', isTrue),
+          isA<Result<Map<String, dynamic>, ApiException>>().having(
+            (result) => result.isFailure,
+            'isFailure',
+            isTrue,
+          ),
         ),
       );
     });

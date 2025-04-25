@@ -9,11 +9,14 @@ class ApiClient {
 
   /// GET 요청
   Future<Result<T, ApiException>> get<T>(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-      }) async {
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
-      final response = await _dio.get<T>(path, queryParameters: queryParameters);
+      final response = await _dio.get<T>(
+        path,
+        queryParameters: queryParameters,
+      );
       return Result.success(response.data as T);
     } on DioException catch (e) {
       return Result.failure(_mapDioErrorToApiException(e));
@@ -26,12 +29,16 @@ class ApiClient {
 
   /// POST 요청
   Future<Result<T, ApiException>> post<T>(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
-      final response = await _dio.post<T>(path, data: data, queryParameters: queryParameters);
+      final response = await _dio.post<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+      );
       return Result.success(response.data as T);
     } on DioException catch (e) {
       return Result.failure(_mapDioErrorToApiException(e));

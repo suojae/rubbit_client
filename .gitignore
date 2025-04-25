@@ -54,3 +54,9 @@ app.*.map.json
 coverage/
 coverage.lcov
 coverage.html
+
+# build_runner-generated Dart files
+**/*.freezed.dart
+**/*.g.dart
+**/*.gr.dart
+**/*.mocks.dart

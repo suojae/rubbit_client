@@ -108,7 +108,9 @@ void main() {
     test('Given Failure 인스턴스'
         'When flatMap() 호출'
         'Then 동일 오류를 가진 Failure를 돌려준다.', () {
-      final result = Result.failure('e').flatMap((_) => Result.success('unused'));
+      final result = Result.failure(
+        'e',
+      ).flatMap((_) => Result.success('unused'));
       expect(result.isFailure, isTrue);
     });
 
@@ -133,7 +135,9 @@ void main() {
     test('Given Failure 인스턴스'
         'When mapError() 호출'
         'Then 오류가 변환된 Failure를 돌려준다.', () {
-      final result = Result<int, String>.failure('e').mapError<int>((e) => e.length);
+      final result = Result<int, String>.failure(
+        'e',
+      ).mapError<int>((e) => e.length);
       expect(result, isA<Failure<int, int>>());
       expect((result as Failure).error, 1);
     });
@@ -153,7 +157,9 @@ void main() {
         'When flatMap() 호출'
         'Then transform Future<Result>가 반환된다.', () async {
       final future = Future.value(Result.success('ok'));
-      final result = await future.flatMap((v) => Future.value(Result.success('$v👍')));
+      final result = await future.flatMap(
+        (v) => Future.value(Result.success('$v👍')),
+      );
 
       expect(result.getOrNull(), 'ok👍');
     });
@@ -162,7 +168,9 @@ void main() {
         'When flatMap() 호출'
         'Then 원본 오류가 그대로 전달된다.', () async {
       final future = Future.value(Result.failure('bad'));
-      final result = await future.flatMap((_) => Future.value(Result.success(1)));
+      final result = await future.flatMap(
+        (_) => Future.value(Result.success(1)),
+      );
 
       expect(result.isFailure, isTrue);
       expect((result as Failure).error, 'bad');
@@ -173,7 +181,10 @@ void main() {
     test('Given Stream<Success>'
         'When mapResult() 호출'
         'Then 각 값이 변환된 Success 스트림을 반환한다.', () async {
-      final stream = Stream.fromIterable([Result.success(1), Result.success(2)]).mapResult((v) => v * 10);
+      final stream = Stream.fromIterable([
+        Result.success(1),
+        Result.success(2),
+      ]).mapResult((v) => v * 10);
 
       final values = await stream.map((r) => r.getOrNull()).toList();
       expect(values, [10, 20]);

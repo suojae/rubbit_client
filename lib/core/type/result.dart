@@ -143,11 +143,13 @@ extension FutureResultExtension<S, E> on Future<Result<S, E>> {
     return result.map(transform);
   }
 
-  Future<Result<T, E>> flatMap<T>(Future<Result<T, E>> Function(S) transform) async {
+  Future<Result<T, E>> flatMap<T>(
+    Future<Result<T, E>> Function(S) transform,
+  ) async {
     final result = await this;
     return result.fold(
-          (value) async => await transform(value),
-          (error) async => Result.failure(error),
+      (value) async => await transform(value),
+      (error) async => Result.failure(error),
     );
   }
 }
@@ -166,7 +168,8 @@ extension StreamResultExtension<S, E> on Stream<Result<S, E>> {
 /// Result 확장 - 로그 처리
 extension InspectResult<S, E> on Result<S, E> {
   Result<S, E> inspect(String tag) {
-    return onSuccess((s) => debugPrint("[$tag] Success: $s"))
-        .onFailure((e) => debugPrint("[$tag] Failure: $e"));
+    return onSuccess(
+      (s) => debugPrint("[$tag] Success: $s"),
+    ).onFailure((e) => debugPrint("[$tag] Failure: $e"));
   }
 }

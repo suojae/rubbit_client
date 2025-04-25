@@ -14,11 +14,17 @@ void main() {
   group('HTTP 상태별 예외 서브클래스', () {
     final Map<Type, ApiException> cases = {
       BadRequestException: BadRequestException(code: '400', message: '잘못된 요청'),
-      UnauthorizedException: UnauthorizedException(code: '401', message: '인증 실패'),
+      UnauthorizedException: UnauthorizedException(
+        code: '401',
+        message: '인증 실패',
+      ),
       ForbiddenException: ForbiddenException(code: '403', message: '권한 없음'),
       NotFoundException: NotFoundException(code: '404', message: '리소스 없음'),
       ConflictException: ConflictException(code: '409', message: '충돌 발생'),
-      TooManyRequestsException: TooManyRequestsException(code: '429', message: '요청 과다'),
+      TooManyRequestsException: TooManyRequestsException(
+        code: '429',
+        message: '요청 과다',
+      ),
       ServerException: ServerException(code: '500', message: '서버 오류'),
     };
 
@@ -43,7 +49,11 @@ void main() {
     test('Given errors 맵이 주어진 ValidationException '
         'When toString을 호출하면 '
         'Then errors 내용이 문자열에 포함된다.', () {
-      final ex = ValidationException(code: '422', message: '검증 실패', errors: {'email': '형식이 올바르지 않습니다.'});
+      final ex = ValidationException(
+        code: '422',
+        message: '검증 실패',
+        errors: {'email': '형식이 올바르지 않습니다.'},
+      );
 
       expect(ex.errors['email'], '형식이 올바르지 않습니다.');
       expect(ex.toString(), contains('errors'));

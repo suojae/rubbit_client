@@ -2,10 +2,7 @@ class ApiException implements Exception {
   final String code;
   final String message;
 
-  ApiException({
-    required this.code,
-    required this.message,
-  });
+  ApiException({required this.code, required this.message});
 
   @override
   String toString() => 'ApiException: [$code] $message';
@@ -65,17 +62,10 @@ class ServerException extends ApiException {
 /// 네트워크 연결 예외
 class NetworkException extends ApiException {
   NetworkException()
-      : super(
-    code: 'network_error',
-    message: '네트워크 연결을 확인해주세요.',
-  );
+    : super(code: 'network_error', message: '네트워크 연결을 확인해주세요.');
 }
 
 /// 타임아웃 예외
 class TimeoutException extends ApiException {
-  TimeoutException()
-      : super(
-    code: 'timeout',
-    message: '요청 시간이 초과되었습니다.',
-  );
+  TimeoutException() : super(code: 'timeout', message: '요청 시간이 초과되었습니다.');
 }

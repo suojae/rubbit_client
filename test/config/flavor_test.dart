@@ -52,8 +52,19 @@ void main() {
 
   group('DevFlavorConfig', () {
     final config = DevFlavorConfig();
+    test('Given DevFlavorConfig 인스턴스'
+        'When 각 속성을 조회하면'
+        'Then 정의된 값이 반환된다.', () {
+      dotenv.testLoad(
+        fileInput: '''
+FIREBASE_API_KEY=test-api-key
+FIREBASE_APP_ID=test-app-id
+FIREBASE_MESSAGING_SENDER_ID=test-sender-id
+FIREBASE_PROJECT_ID=test-project-id
+''',
+      );
+      addTearDown(dotenv.clean);
 
-    test('Given DevFlavorConfig 인스턴스 When 각 속성을 조회하면 Then 정의된 값이 반환된다.', () {
       expect(config.flavorType, FlavorType.dev);
       expect(config.appTitle, 'RUBBIT Dev');
       expect(config.baseApiUrl, 'https://rubbit-dev.suojae.kr/');

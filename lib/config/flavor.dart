@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' as services;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:rubbit_client/config/firebase_options_dev.dart';
-import 'package:rubbit_client/config/firebase_options_prod.dart';
 
 enum FlavorType {
   dev,
@@ -72,6 +70,22 @@ abstract class FlavorConfig {
   String env(String key, {String defaultValue = ''}) {
     return dotenv.env[key] ?? defaultValue;
   }
+
+  FirebaseOptions _createFirebaseOptionsFromEnv() {
+    return FirebaseOptions(
+      apiKey: env('FIREBASE_API_KEY'),
+      appId: env('FIREBASE_APP_ID'),
+      messagingSenderId: env('FIREBASE_MESSAGING_SENDER_ID'),
+      projectId: env('FIREBASE_PROJECT_ID'),
+      authDomain: env('FIREBASE_AUTH_DOMAIN', defaultValue: ''),
+      storageBucket: env('FIREBASE_STORAGE_BUCKET', defaultValue: ''),
+      measurementId: env('FIREBASE_MEASUREMENT_ID', defaultValue: ''),
+      databaseURL: env('FIREBASE_DATABASE_URL', defaultValue: ''),
+      iosClientId: env('FIREBASE_IOS_CLIENT_ID', defaultValue: ''),
+      iosBundleId: env('FIREBASE_IOS_BUNDLE_ID', defaultValue: ''),
+      androidClientId: env('FIREBASE_ANDROID_CLIENT_ID', defaultValue: ''),
+    );
+  }
 }
 
 /// 개발 환경 설정
@@ -86,7 +100,9 @@ class DevFlavorConfig extends FlavorConfig {
   String get baseApiUrl => 'https://rubbit-dev.suojae.kr/';
 
   @override
-  FirebaseOptions get firebaseOptions => DevFirebaseOptions.currentPlatform;
+  FirebaseOptions get firebaseOptions {
+    return _createFirebaseOptionsFromEnv();
+  }
 
   @override
   bool get isLoggingEnabled => true;
@@ -107,7 +123,9 @@ class ProdFlavorConfig extends FlavorConfig {
   String get baseApiUrl => 'https://rubbit.suojae.kr/';
 
   @override
-  FirebaseOptions get firebaseOptions => ProdFirebaseOptions.currentPlatform;
+  FirebaseOptions get firebaseOptions {
+    return _createFirebaseOptionsFromEnv();
+  }
 
   @override
   bool get isLoggingEnabled => false;
